@@ -17,6 +17,8 @@ public class Guitar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String brand;
+    private String model;
 
     public Long getId() {
         return id;
@@ -42,8 +44,6 @@ public class Guitar {
         this.model = model;
     }
 
-    private String brand;
-    private String model;
 
     // No need for explicit getters, setters, or constructors
 

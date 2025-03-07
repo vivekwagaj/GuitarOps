@@ -4,6 +4,9 @@ import guitarclass.service.GuitarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+
 
 import java.util.List;
 
@@ -34,12 +37,15 @@ public class GuitarController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Guitar> createGuitar(@RequestBody Guitar guitar) {
+        guitar.setId(null);
         Guitar createdGuitar = guitarService.createGuitar(guitar);
         return ResponseEntity.ok(createdGuitar);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Guitar> updateGuitar(@PathVariable Long id, @RequestBody Guitar updatedGuitar) {
         Guitar guitar = guitarService.updateGuitar(id, updatedGuitar);
@@ -50,6 +56,7 @@ public class GuitarController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGuitar(@PathVariable Long id) {
         guitarService.deleteGuitar(id);

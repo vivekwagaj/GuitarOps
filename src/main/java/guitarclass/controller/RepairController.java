@@ -36,6 +36,7 @@ public class RepairController {
 
     @PostMapping
     public ResponseEntity<Repair> createRepair(@RequestBody Repair repair) {
+        repair.setId(null);
         Repair createdRepair = repairService.createRepair(repair);
         return ResponseEntity.ok(createdRepair);
     }
