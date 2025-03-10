@@ -1,8 +1,5 @@
 package guitarclass.entity;// Customer.java
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +21,10 @@ public class Customer {
 
     private String firstName;
     private String lastName;
+    private String email;
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
+    private User user;
 
     public Long getId() {
         return id;
@@ -57,7 +58,17 @@ public class Customer {
         this.email = email;
     }
 
-    private String email;
+
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+
 
     // Constructors, getters, setters, and other methods
 

@@ -22,14 +22,16 @@ const Navbar = () => {
         {token ? (
                 <>
         <Link className="mx-2" to="/cart">Cart</Link>
-        <Link className="mx-2" to="/customers/new">Customers</Link>
+        {role === "ROLE_ADMIN" && <Link className="mx-2" to="/customers/new">Customers</Link>}
         <Link className="mx-2" to="/repairs/new">Repairs</Link>
+        <Link to="/profile">My Profile</Link>
         {role === "ROLE_ADMIN" && <Link className="mx-2" to="/manage-guitars">Manage Guitars(Admin Only)</Link>} {/* Admin Only */}
         <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded">Logout</button>
                 </>
               ) : (
                 <>
                   <Link to="/login">Login</Link>
+                  <Link to="/register" className="ml-4">Register</Link>
                 </>
               )}
       </div>

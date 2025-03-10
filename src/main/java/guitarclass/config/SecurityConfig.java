@@ -51,19 +51,31 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:3000")); // ✅ Allow React frontend
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // ✅ Allow necessary methods
-                    config.setAllowedHeaders(List.of("Authorization", "Content-Type")); // ✅ Allow Authorization headers
+                    config.setAllowedOriginPatterns(List.of("http://localhost:3000")); // ✅ Use Allowed Origin Patterns
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // ✅ Allow all methods
+                    config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Access-Control-Allow-Origin", "*")); // ✅ Allow all headers
+                    config.setExposedHeaders(List.of("Authorization")); // ✅ Expose the Authorization header to the frontend
                     config.setAllowCredentials(true);
                     return config;
                 }))
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for APIs
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/login", "POST")).permitAll() // Public access to login
+                        .requestMatchers(new AntPathRequestMatcher("/api/auth/register", "POST")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/cart/**", "POST")).permitAll()// Public access to cart
+                        .requestMatchers(new AntPathRequestMatcher("/api/cart", "GET")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/cart/**", "PUT")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/cart/**", "DELETE")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/cart/checkout/**", "POST")).permitAll()// Public access to cart
                         .requestMatchers(new AntPathRequestMatcher("/api/guitars", "GET")).permitAll() // Allow browsing guitars
                         .requestMatchers(new AntPathRequestMatcher("/api/guitars/**", "POST")).hasAuthority("ROLE_ADMIN") // Admins can add guitars
                         .requestMatchers(new AntPathRequestMatcher("/api/guitars/**", "PUT")).hasAuthority("ROLE_ADMIN") // Admins can update guitars
                         .requestMatchers(new AntPathRequestMatcher("/api/guitars/**", "DELETE")).hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/api/parts", "GET")).permitAll() // Allow browsing guitars
+                        .requestMatchers(new AntPathRequestMatcher("/api/parts/**", "POST")).hasAuthority("ROLE_ADMIN") // Admins can add guitars
+                        .requestMatchers(new AntPathRequestMatcher("/api/parts/**", "PUT")).hasAuthority("ROLE_ADMIN") // Admins can update guitars
+                        .requestMatchers(new AntPathRequestMatcher("/api/parts/**", "DELETE")).hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/api/customers/**", "POST")).hasAuthority("ROLE_ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/api/repairs","POST")).hasAuthority("ROLE_USER") // Only Users can create repair requests
                         .requestMatchers(new AntPathRequestMatcher("/api/repairs","GET")).hasAnyAuthority("ROLE_USER", "ROLE_TECHNICIAN", "ROLE_ADMIN") // Users, Technicians, and Admins can view repair requests
                         .requestMatchers(new AntPathRequestMatcher("/api/repairs/**","PUT")).hasAuthority("ROLE_TECHNICIAN") // Only Technicians can update repair status

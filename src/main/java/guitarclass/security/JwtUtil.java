@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -18,7 +19,7 @@ public class JwtUtil {
 
     private static final String SECRET_KEY = "yourSuperSecretKeyForJWTThatIsAtLeast32Chars"; // Change for production
 
-    public String generateToken(String username, Set<String> roles) {
+    public String generateToken(String username, List<String> roles) {
         return Jwts.builder()
                 .subject(username)
                 .claim("roles", roles) // 🔥 FIX: Add roles to JWT payload

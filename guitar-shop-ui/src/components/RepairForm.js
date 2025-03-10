@@ -12,6 +12,8 @@ const repairSchema = yup.object().shape({
 });
 
 const RepairForm = () => {
+  const role = localStorage.getItem("role"); // Get user role
+
   const {
     register,
     handleSubmit,
@@ -51,8 +53,10 @@ const RepairForm = () => {
       <p className="text-red-500 text-sm">{errors.description?.message}</p>
 
       <label className="flex items-center space-x-2">
-        <input type="checkbox" {...register("resolved")} className="h-4 w-4" />
-        <span>Mark as resolved</span>
+        <input type="checkbox" {...register("resolved")} className="h-4 w-4" disabled={role === "ROLE_USER"} />
+        <span className={role === "ROLE_USER" ? "text-gray-500" : ""}>
+          Mark as resolved (For technicians only)
+        </span>
       </label>
 
       <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mt-2">

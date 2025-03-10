@@ -18,7 +18,7 @@ public class User {
     private Long id;
 
     @Setter
-    private String username;
+    private String email;
     @Setter
     private String password;
 
@@ -31,8 +31,8 @@ public class User {
     // Constructors
     public User() {}
 
-    public User(String username, String password, Set<String> roles) {
-        this.username = username;
+    public User(String email, String password, Set<String> roles) {
+        this.email = email;
         this.password = password;
         this.roles = roles;
     }

@@ -16,10 +16,10 @@ public class CORSConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowCredentials(true); // ✅ Important: Allow credentials (Authorization headers)
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // ✅ Allow React frontend
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type")); // ✅ Explicitly allow Authorization header
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // ✅ Allow necessary methods
+        config.setAllowCredentials(true); // ✅ Allow credentials
+        config.addAllowedOriginPattern("*"); // ✅ Use pattern to match any origin
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Access-Control-Allow-Origin")); // ✅ Allow necessary headers
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // ✅ Allow all methods
 
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);

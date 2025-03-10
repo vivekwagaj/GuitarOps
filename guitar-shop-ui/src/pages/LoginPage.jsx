@@ -2,14 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess(false);
 
     try {
       const response = await fetch("http://localhost:8080/api/auth/login", {
@@ -17,7 +19,7 @@ const LoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
@@ -26,21 +28,30 @@ const LoginPage = () => {
 
       const data = await response.json();
       localStorage.setItem("token", data.token);
-      const decodedToken = JSON.parse(atob(data.token.split(".")[1]));
+      const decodedToken = (() => {
+                             try {
+                               return JSON.parse(atob(data.token.split(".")[1]));
+                             } catch (err) {
+                               console.error("❌ Error decoding token:", err.message);
+                               return null;
+                             }
+                           })();
       console.log("✅ Decoded Token:", decodedToken); // Debugging
 
-      const roles = decodedToken.roles || []; // Get all roles
-      let userRole = "ROLE_USER"; // Default role
-
-      if (roles.includes("ROLE_ADMIN")) {
-        userRole = "ROLE_ADMIN";
-      } else if (roles.includes("ROLE_TECHNICIAN")) {
-        userRole = "ROLE_TECHNICIAN";
-      }
+      const roles = decodedToken?.roles || [];
+      const userRole = roles.includes("ROLE_ADMIN")
+       ? "ROLE_ADMIN"
+       : roles.includes("ROLE_TECHNICIAN")
+       ? "ROLE_TECHNICIAN"
+       : "ROLE_USER"; // Default role
 
       localStorage.setItem("role", userRole); // Store user role
-
-      window.location.reload(); // Refresh to apply changes
+      localStorage.setItem("username", decodedToken.sub); // 🔥 Store the username (email)
+      setSuccess(true);
+      setTimeout(() => {
+              navigate("/");
+              window.location.reload(); // Refresh to apply changes
+              }, 500);
     } catch (err) {
       setError(err.message);
     }
@@ -56,14 +67,15 @@ const LoginPage = () => {
 
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+        {success && <p className="text-green-500 text-center">✅ Login Successful! Redirecting...</p>}
         {error && <p className="text-red-500 text-center">{error}</p>}
         <form onSubmit={handleLogin} className="space-y-4">
           <input
             type="text"
-            placeholder="Username"
+            placeholder="Email"
             className="w-full p-2 border rounded"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type="password"
