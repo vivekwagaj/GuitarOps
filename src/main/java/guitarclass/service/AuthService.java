@@ -1,8 +1,10 @@
 package guitarclass.service;
 
 import guitarclass.dto.RegisterRequest;
+import guitarclass.entity.Cart;
 import guitarclass.entity.Customer;
 import guitarclass.entity.User;
+import guitarclass.repository.CartRepository;
 import guitarclass.repository.CustomerRepository;
 import guitarclass.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,14 +33,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
 
+    private final CartRepository cartRepository;
+
     private final CustomUserDetailsService customUserDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, CustomerRepository customerRepository, CustomUserDetailsService customUserDetailsService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, CustomerRepository customerRepository, CartRepository cartRepository, CustomUserDetailsService customUserDetailsService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
+        this.cartRepository = cartRepository;
         this.customUserDetailsService = customUserDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -56,7 +62,7 @@ public class AuthService {
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
-
+            ensureUserCartExists(request.getEmail());
             // Generate the token including roles
             return jwtUtil.generateToken(userDetails.getUsername(), roles);
         } catch (Exception e) {
@@ -84,6 +90,26 @@ public class AuthService {
         newCustomer.setUser(newUser); // Link to the user
 
         customerRepository.save(newCustomer); // Save customer
+
+        Cart cart = new Cart();
+        cart.setCustomer(newCustomer);
+        cart.setTotalPrice(0.0);
+        cartRepository.save(cart);
+
+    }
+
+    public void ensureUserCartExists(String email) {
+        Optional<Customer> customerOpt = customerRepository.findByEmail(email);
+        if (customerOpt.isPresent()) {
+            Customer customer = customerOpt.get();
+            if (!cartRepository.existsByCustomer(customer)) {
+                Cart cart = new Cart();
+                cart.setCustomer(customer);
+                cart.setTotalPrice(0.0);
+                cartRepository.save(cart);
+                System.out.println("🛒 Cart created for user: " + email);
+            }
+        }
     }
 }
 

@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Getter
 @Entity
 @Data
@@ -22,6 +24,19 @@ public class Guitar {
     private String brand;
     private String model;
     private double price;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Guitar guitar = (Guitar) o;
+        return id != null && id.equals(guitar.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
     // No need for explicit getters, setters, or constructors
 

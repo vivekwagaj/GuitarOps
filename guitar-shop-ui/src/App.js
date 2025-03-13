@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { CartProvider } from "./context/CartContext";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
-import Cart from "./pages/Cart";
+import Cart from "./pages/newCart";
 import Customers from "./pages/Customers";
 import Repairs from "./pages/Repairs";
 import Checkout from "./pages/Checkout";

@@ -65,7 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/cart/**", "POST")).permitAll()// Public access to cart
                         .requestMatchers(new AntPathRequestMatcher("/api/cart", "GET")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/cart/**", "PUT")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/cart/**", "DELETE")).permitAll()
+                        .antMatchers(HttpMethod.DELETE, "/api/cart/**").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/cart/checkout/**", "POST")).permitAll()// Public access to cart
                         .requestMatchers(new AntPathRequestMatcher("/api/guitars", "GET")).permitAll() // Allow browsing guitars
                         .requestMatchers(new AntPathRequestMatcher("/api/guitars/**", "POST")).hasAuthority("ROLE_ADMIN") // Admins can add guitars

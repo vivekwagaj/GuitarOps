@@ -3,9 +3,8 @@ import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.Authentication;
 
 @Entity
 
@@ -25,6 +24,10 @@ public class Customer {
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;
+
+    public Customer(Long customerId) {
+        this.id=customerId;
+    }
 
     public Long getId() {
         return id;

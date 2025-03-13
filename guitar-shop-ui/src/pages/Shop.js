@@ -13,25 +13,45 @@ const Shop = () => {
       setGuitars(data);
     };
     const fetchParts = async () => {
-      const response = await fetch("http://localhost:8080/api/parts");
-      const data = await response.json();
-      setParts(data);
-    };
+        try {
+          const response = await fetch("http://localhost:8080/api/parts");
+          const data = await response.json();
+          console.log("🛠️ Fetched Parts Data:", JSON.stringify(data, null, 2));  // 🔥 Print fetched parts
+          setParts(data);
+        } catch (err) {
+          console.error("Failed to fetch parts:", err);
+        }
+      };
 
     fetchGuitars();
     fetchParts();
   }, []);
 
   const handleAddToCart = (item, isPart) => {
-    const cartItem = {
-      id: item.id,
-      name: isPart ? item.name : `${item.brand} - ${item.model}`,  // 🔥 Fix: Properly set the name
-      price: item.price,
-      quantity: 1,
+      const cartItem = {
+        id: item.id,
+        name: isPart ? item.name : `${item.brand} - ${item.model}`,  // 🔥 Properly set the name
+        price: item.price,
+        quantity: 1,
+        guitar: !isPart ? { id: item.id , brand: item.brand, model: item.model, price: item.price } : null,   // ✅ Correct way to set guitar ID
+        guitarpart: isPart ? { id: item.id, name: item.name, price: item.price  } : null,  // ✅ Correct way to set part ID
+      };
+      addToCart(cartItem);  // ✅ Use the context function
+      alert("Added to cart!");
     };
-    addToCart(cartItem);
-    alert("Added to cart!");
-  };
+
+    const handleAddPartToCart = (part) => {
+      const cartItem = {
+        id: part.id,
+        name: part.name,  // ✅ Properly set the part name
+        price: part.price,
+        quantity: 1,
+        guitar: null,  // 🔥 Explicitly set guitar as null
+        guitarpart: { id: part.id, name: part.name, price: part.price  },  // ✅ Set part ID correctly
+      };
+      addToCart(cartItem);  // ✅ Use the context function
+      alert("Added to cart!");
+    };
 
   return (
     <div className="p-6">
@@ -56,7 +76,7 @@ const Shop = () => {
           <span>${part.price}</span>
           <button
             className="bg-green-500 text-white px-2 py-1 rounded"
-            onClick={() => handleAddToCart(part)}
+            onClick={() => handleAddPartToCart(part)}
           >
             Add to Cart
           </button>

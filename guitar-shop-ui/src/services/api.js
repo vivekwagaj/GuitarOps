@@ -65,3 +65,77 @@ export const createRepairRequest = async (repairData) => {
   }
 };
 
+export const addToCart = async (customerId, item) => {
+  if (!customerId) {
+    console.error("Customer ID is not available");
+    return;
+  }
+  console.log("🚀 Adding to Cart (API):", JSON.stringify(item, null, 2));
+  const response = await fetch(`http://localhost:8080/api/cart/${customerId}/add`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify(item),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to add to cart: ${response.statusText}`);
+  }
+
+  return response.json();
+};
+
+export const getCart = async (customerId) => {
+  if (!customerId) {
+    console.error("Customer ID is not available");
+    return;
+  }
+  const response = await fetch(`http://localhost:8080/api/cart/${customerId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  return response.json();
+};
+
+export const checkout = async (customerId) => {
+  const response = await fetch(`http://localhost:8080/api/cart/checkout/${customerId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  return response.json();
+};
+
+export const removeFromCartAPI = async (customerId, itemId) => {
+  const response = await fetch(`http://localhost:8080/api/cart/${customerId}/remove`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify({ id: itemId }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to remove item from cart");
+  }
+};
+
+export const clearCartAPI = async (customerId) => {
+  const response = await fetch(`http://localhost:8080/api/cart/${customerId}/clear`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to clear cart: ${response.statusText}`);
+  }
+
+};

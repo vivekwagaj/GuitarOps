@@ -47,7 +47,23 @@ const LoginPage = () => {
 
       localStorage.setItem("role", userRole); // Store user role
       localStorage.setItem("username", decodedToken.sub); // 🔥 Store the username (email)
+
+      const customerResponse = await fetch(`http://localhost:8080/api/customers/email/${decodedToken.sub}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+        },
+      });
+
+      if (!customerResponse.ok) {
+        throw new Error("Failed to fetch customer details");
+      }
+
+      const customerData = await customerResponse.json();
+      localStorage.setItem("customerId", customerData.id);
+
       setSuccess(true);
+
       setTimeout(() => {
               navigate("/");
               window.location.reload(); // Refresh to apply changes
