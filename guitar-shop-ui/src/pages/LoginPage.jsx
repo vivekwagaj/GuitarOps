@@ -61,6 +61,8 @@ const LoginPage = () => {
 
       const customerData = await customerResponse.json();
       localStorage.setItem("customerId", customerData.id);
+      localStorage.setItem("phoneNumbers", JSON.stringify(customerData.phoneNumbers));
+      localStorage.setItem("addresses", JSON.stringify(customerData.addresses));
 
       setSuccess(true);
 

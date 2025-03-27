@@ -31,13 +31,9 @@ public class CustomerController {
     @GetMapping("/me")
     public ResponseEntity<Customer> getMyProfile(Authentication authentication) {
         String username = authentication.getName();
-        Customer customer = customerService.getCustomerByEmail(username);
+        Customer customer = customerService.getCustomerProfile(username);
 
-        if (customer == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(customer);
+        return customer != null ? ResponseEntity.ok(customer) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{id}")

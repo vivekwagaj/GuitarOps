@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { addToCart as addToCartAPI, clearCartAPI, getCart, checkout, removeFromCartAPI } from "../services/api";
 
+
 const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
@@ -8,6 +9,7 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+
 
   // Fetch the cart from the backend on mount
   const fetchCart = async () => {
@@ -25,6 +27,8 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, []);
 
+
+
   // Add to cart function
   const addToCart = async (item) => {
 
@@ -39,10 +43,13 @@ export const CartProvider = ({ children }) => {
       const existingItem = cart.find((cartItem) => cartItem.id === item.id);
       if (existingItem) {
         // Update the quantity of the existing item
-        existingItem.quantity += item.quantity;
-        existingItem.price += item.price * item.quantity;
+        const updatedItem = {
+                ...existingItem,
+                quantity: existingItem.quantity + item.quantity,
+                price: existingItem.price + item.price * item.quantity,
+              };
         // Update the backend with the new quantity and price
-        await addToCartAPI(customerId, existingItem);
+        await addToCartAPI(customerId, updatedItem);
       } else {
         // Add new item to the cart
         await addToCartAPI(customerId, item);
@@ -103,14 +110,7 @@ const removeFromCart = async (itemId) => {
   }
 };
 
-  // Checkout function
-  const handleCheckout = async () => {
-    const customerId = localStorage.getItem("customerId");
-    await checkout(customerId);
-    setCart([]);
-    setTotalPrice(0);
-    alert("Checkout successful!");
-  };
+
 
 
   const clearCart = async () => {
@@ -132,7 +132,7 @@ const removeFromCart = async (itemId) => {
 
 
   return (
-    <CartContext.Provider value={{ cart, totalPrice, addToCart, removeFromCart, handleCheckout, clearCart }}>
+    <CartContext.Provider value={{ cart, totalPrice, addToCart, removeFromCart,   clearCart }}>
       {children}
     </CartContext.Provider>
   );

@@ -1,8 +1,8 @@
 package guitarclass.controller;
 
-import guitarclass.entity.Cart;
-import guitarclass.entity.CartItem;
-import guitarclass.entity.Customer;
+import guitarclass.dto.CheckoutRequest;
+import guitarclass.entity.*;
+import guitarclass.repository.CustomerRepository;
 import guitarclass.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +21,8 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @PostMapping("/{customerId}/add")
     public ResponseEntity<Map<String, String>> addToCart(@PathVariable Long customerId, @RequestBody CartItem item) {
@@ -40,6 +42,7 @@ public class CartController {
     @GetMapping("/{customerId}")
     public ResponseEntity<Cart> getCart(@PathVariable Long customerId) {
         try {
+
             Cart cart = cartService.getCartByCustomerId(customerId);
             return ResponseEntity.ok(cart);
         } catch (Exception e) {
@@ -59,8 +62,28 @@ public class CartController {
     }
 
     @PostMapping("/checkout/{customerId}")
-    public ResponseEntity<String> checkout(@PathVariable Long customerId) {
+    public ResponseEntity<String> checkout(@PathVariable Long customerId,@RequestBody CheckoutRequest checkoutRequest) {
         try {
+            Customer customer = customerRepository.findById(customerId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+            // Update phone number during checkout
+            customer.getPhoneNumbers().clear();
+            customer.getAddresses().clear();
+
+            // Update phone numbers and addresses during checkout
+            for (PhoneNumber phoneNumber : checkoutRequest.getPhoneNumbers()) {
+                phoneNumber.setCustomer(customer);  // ✅ Associate with customer
+                customer.getPhoneNumbers().add(phoneNumber);
+            }
+
+            // Associate new addresses
+            for (Address address : checkoutRequest.getAddresses()) {
+                address.setCustomer(customer);  // ✅ Associate with customer
+                customer.getAddresses().add(address);
+            }
+            customerRepository.save(customer);
+
             cartService.checkout(customerId);
             return ResponseEntity.ok("Checkout successful");
         } catch (Exception e) {

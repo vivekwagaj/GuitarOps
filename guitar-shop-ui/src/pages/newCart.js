@@ -3,8 +3,14 @@ import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
-    const { cart, totalPrice, handleCheckout, removeFromCart, clearCart } = useCart();
+    const { cart, totalPrice,  removeFromCart,  clearCart } = useCart();
+
     const navigate = useNavigate();
+
+    const checkOut = () => {
+
+                         navigate("/checkout");
+                       };
 
     if (cart.length === 0) {
         return (
@@ -34,7 +40,7 @@ const Cart = () => {
                 <div className="text-right text-xl font-semibold mt-4">Total: ${totalPrice.toFixed(2)}</div>
                 <div className="mt-6 flex justify-end gap-4">
                     <button onClick={clearCart} className="bg-red-500 text-white py-2 px-4 rounded">Clear Cart</button>
-                    <button onClick={handleCheckout} className="bg-green-500 text-white py-2 px-4 rounded">Checkout</button>
+                    <button onClick={checkOut} className="bg-green-500 text-white py-2 px-4 rounded">Checkout</button>
                 </div>
             </div>
         </div>

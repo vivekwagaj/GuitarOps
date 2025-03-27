@@ -26,6 +26,7 @@ public class CartService {
     private CartItemRepository cartItemRepository;
 
     public Cart getOrCreateCart(Long customerId) {
+
         return cartRepository.findByCustomerId(customerId)
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
@@ -74,26 +75,33 @@ public class CartService {
             System.out.println("Append");
             CartItem cartItem = existingItem.get();
             cartItem.setQuantity(cartItem.getQuantity() + item.getQuantity());
-            cartItem.setPrice(cartItem.getPrice() + (item.getPrice() * item.getQuantity()));
+            cartItem.setPrice(cartItem.getPrice() + item.getPrice() );
             cartItem.setCart(cart);
         cartItemRepository.save(cartItem);  // ✅ Save the updated item
     } else {
         // Add the new item to the cart
             System.out.println("New Item: " + cart.getItems());
             item.setCart(cart);  // ✅ Make sure the cart is associated before saving
-//            cart.getItems().add(item);  // ✅ Add item to the cart
+
             cartItemRepository.save(item);  // ✅ Save the new item
+//            cart.getItems().add(item);  // ✅ Add item to the cart
     }
 
+//        cart.setItems(cartItemRepository.findByCartId(cart.getId()));
+            System.out.println(cart.getItems());
+
         // Update total price
-        cart.setTotalPrice(cart.getItems().stream()
+        double totalPrice = cartItemRepository.findByCartId(cart.getId()).stream()
                 .mapToDouble(CartItem::getPrice)
-                .sum());
+                .sum();
+        cart.setTotalPrice(totalPrice);
+
+        System.out.println(cart.getTotalPrice());
 
         // 🔥 Save the cart with updated items
         cartRepository.save(cart);
-}
 
+    }
 
     public void checkout(Long customerId) {
         Cart cart = getOrCreateCart(customerId);
@@ -107,9 +115,7 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    public Cart getCart(Long customerId) {
-        return getOrCreateCart(customerId);
-    }
+
 
     public Cart getCartByCustomerId(Long customerId) {
         return cartRepository.findByCustomerId(customerId)

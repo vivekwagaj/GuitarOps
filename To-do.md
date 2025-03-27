@@ -38,7 +38,7 @@ Payment Integration (Optional) → Mock payment gateway or simple cash-on-delive
 ✔️ **Cart Persistence → Store cart items in localStorage, so they persist on refresh.
 ### **🔹 F. Checkout Process
 
-🔲 ** Checkout Page → Users enter details and place an order.
+✔️ ** Checkout Page → Users enter details and place an order.
 🔲 ** Order Confirmation → Store order details in the backend.
 ---
 
@@ -46,8 +46,8 @@ Payment Integration (Optional) → Mock payment gateway or simple cash-on-delive
 These features will improve usability and make your app more powerful.
 
 ### **🔹 A. Order & Purchase System**
-🔲 **Customers can buy guitars**  
-🔲 **Store order details in the database**  
+✔️ **Customers can buy guitars**  
+✔️ **Store order details in the database**  
 🔲 **Admins can track order statuses (Pending, Shipped, Delivered)**
 
 ### **🔹 B. Customer Wishlist**
