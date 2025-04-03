@@ -70,6 +70,7 @@ const Checkout = () => {
         body: JSON.stringify({
           phoneNumbers: phoneNumberList,
           addresses: addressList,
+          payment: paymentMethod,
         }),
       });
 
@@ -259,8 +260,10 @@ const Checkout = () => {
             onChange={(e) => setPaymentMethod(e.target.value)}
             className="w-full p-2 border rounded mb-4"
           >
-            <option value="COD">Cash on Delivery</option>
-            <option value="Card">Credit/Debit Card</option>
+            <option value="Credit Card">Credit Card</option>
+            <option value="Debit Card">Debit Card</option>
+            <option value="PayPal">PayPal</option>
+            <option value="Cash on Delivery">Cash on Delivery</option>
           </select>
 
           {/* 📝 Total Price and Checkout Button */}

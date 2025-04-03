@@ -38,6 +38,10 @@ public class Customer {
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Order> orders;
+
     public Customer(Long customerId) {
         this.id=customerId;
     }

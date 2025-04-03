@@ -84,7 +84,7 @@ public class CartController {
             }
             customerRepository.save(customer);
 
-            cartService.checkout(customerId);
+            cartService.checkout(customerId,checkoutRequest);
             return ResponseEntity.ok("Checkout successful");
         } catch (Exception e) {
             e.printStackTrace();

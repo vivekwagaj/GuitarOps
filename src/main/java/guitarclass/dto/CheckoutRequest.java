@@ -16,4 +16,5 @@ import java.util.List;
 public class CheckoutRequest {
     private List<PhoneNumber> phoneNumbers;
     private List<Address> addresses;
+    private String paymentMethod;
 }

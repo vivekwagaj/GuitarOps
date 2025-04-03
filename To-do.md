@@ -22,7 +22,7 @@ Payment Integration (Optional) → Mock payment gateway or simple cash-on-delive
 
 ### **🔹 C. Manage Customers**
 ✔️ **Customers can be added to the system**  
-🔲 **Retrieve customer purchase & repair history** (Show previous orders & repairs)
+✔️ **Retrieve customer purchase & repair history** (Show previous orders & repairs)
 
 ### **🔹 D. Repair Requests**
 ✔️ **Customers can submit repair requests**  

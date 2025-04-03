@@ -21,12 +21,17 @@ public class CartItem {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cart_id")  // 🔥 Link back to Cart
-    @JsonBackReference
+    @JsonBackReference("cart-items")
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = true)  // 🔥 Either guitar or part
     @JoinColumn(name = "guitar_id")
     private Guitar guitar;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "order_id")  // New field to link orders
+    @JsonBackReference("order-items")
+    private Order order;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = true)  // 🔥 Either guitar or part
     @JoinColumn(name = "part_id")

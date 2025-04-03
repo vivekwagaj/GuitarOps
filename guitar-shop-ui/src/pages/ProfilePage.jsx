@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState("");
+  const [expandedOrders, setExpandedOrders] = useState({});
+  const [visibleOrders, setVisibleOrders] = useState(3); // Controls visible order count
 
   useEffect(() => {
     fetch("http://localhost:8080/api/customers/me", {
@@ -16,6 +18,11 @@ const ProfilePage = () => {
       .then((data) => setProfile(data))
       .catch((err) => setError(err.message));
   }, []);
+
+  const toggleOrder = (orderId) => {
+      setExpandedOrders((prev) => ({ ...prev, [orderId]: !prev[orderId] }));
+    };
+
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 p-6">
@@ -70,23 +77,25 @@ const ProfilePage = () => {
               )}
             </div>
 
-            {/* Orders */}
-            <div>
-              <h3 className="text-xl font-semibold text-gray-700">Orders</h3>
-              {profile.orders && profile.orders.length > 0 ? (
-                <ul className="space-y-2">
-                  {profile.orders.map((order) => (
-                    <li key={order.id} className="p-2 border rounded">
-                      <p><strong>Order ID:</strong> {order.id}</p>
-                      <p><strong>Status:</strong> {order.status}</p>
-                      <p><strong>Total:</strong> ${order.totalPrice.toFixed(2)}</p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">No orders found.</p>
-              )}
+            {/* Orders Section */}
+            <h3 className="text-xl font-bold mt-4">Previous Orders</h3>
+            <div className="max-h-[300px] overflow-y-auto">
+              <OrderList
+                orders={profile.orders.slice(0, visibleOrders)}
+                expandedOrders={expandedOrders}
+                toggleOrder={toggleOrder}
+              />
             </div>
+
+            {/* Show More/Less Orders */}
+            {profile.orders.length > 3 && (
+              <button
+                onClick={() => setVisibleOrders(visibleOrders === 3 ? profile.orders.length : 3)}
+                className="text-blue-500 hover:underline mt-2"
+              >
+                {visibleOrders === 3 ? "Show More Orders" : "Show Less Orders"}
+              </button>
+            )}
           </div>
         ) : (
           <p className="text-gray-600 text-center">Loading profile...</p>
@@ -94,6 +103,55 @@ const ProfilePage = () => {
       </div>
     </div>
   );
+};
+
+// ✅ Extracted ProfileSection for reuse
+const ProfileSection = ({ title, children }) => (
+  <div className="border-b pb-4">
+    <h3 className="text-xl font-semibold text-gray-700">{title}</h3>
+    {children}
+  </div>
+);
+
+// ✅ Extracted OrderList for cleaner JSX
+const OrderList = ({ orders, expandedOrders, toggleOrder }) => {
+  if (!orders.length) return <p className="text-gray-500">No orders found.</p>;
+
+  return orders.map((order) => (
+    <div key={order.id} className="border rounded bg-gray-100 w-full mt-2">
+      {/* Order Header */}
+      <button
+        onClick={() => toggleOrder(order.id)}
+        className="w-full text-left p-4 flex justify-between items-center bg-gray-200 hover:bg-gray-300 transition-all rounded-t"
+      >
+        <span>
+          <strong>Order ID:</strong> {order.id} -
+          <strong> Status:</strong> {order.orderStatus} -
+          <strong> Total:</strong> ${order.totalPrice.toFixed(2)}
+        </span>
+        <span>{expandedOrders[order.id] ? "▲" : "▼"}</span>
+      </button>
+
+      {/* Order Details (Collapsible) */}
+      {expandedOrders[order.id] && (
+        <div className="p-4">
+          <h4 className="font-bold">Items:</h4>
+          <ul className="list-disc pl-5">
+            {order.items.map((item) => (
+              <li key={item.id}>{getItemDescription(item)} ({item.quantity}x)</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  ));
+};
+
+// ✅ Helper function for item descriptions
+const getItemDescription = (item) => {
+  if (item.guitar) return `🎸 ${item.guitar.brand} ${item.guitar.model} - $${item.price}`;
+  if (item.guitarpart) return `🛠 ${item.guitarpart.name} - $${item.price}`;
+  return `❓ Unknown Item - $${item.price}`;
 };
 
 export default ProfilePage;

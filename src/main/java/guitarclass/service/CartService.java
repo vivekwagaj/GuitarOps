@@ -1,13 +1,16 @@
 package guitarclass.service;
 
+import guitarclass.dto.CheckoutRequest;
 import guitarclass.entity.*;
+import guitarclass.entity.enums.OrderStatus;
 import guitarclass.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -21,6 +24,9 @@ public class CartService {
 
     @Autowired
     private GuitarPartRepository partRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
     private CartItemRepository cartItemRepository;
@@ -103,16 +109,44 @@ public class CartService {
 
     }
 
-    public void checkout(Long customerId) {
+    public void checkout(Long customerId, CheckoutRequest checkoutRequest) {
         Cart cart = getOrCreateCart(customerId);
         if (cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
+        Order order = new Order();
+        order.setCustomer(cart.getCustomer());
+        order.setOrderDate(LocalDateTime.now());
+        order.setTotalPrice(cart.getTotalPrice());
+        order.setOrderStatus(OrderStatus.PENDING);
+        order.setPaymentMethod(checkoutRequest.getPaymentMethod());
+        order.setShippingAddress(checkoutRequest.getAddresses().get(0));
+
+
+        List<CartItem> orderItems = new ArrayList<>();
+        for (CartItem cartItem : cart.getItems()) {
+            CartItem orderItem = new CartItem();
+            orderItem.setOrder(order);
+            orderItem.setGuitar(cartItem.getGuitar());
+            orderItem.setGuitarpart(cartItem.getGuitarpart());
+            orderItem.setQuantity(cartItem.getQuantity());
+            if (cartItem.getGuitar() != null) {
+                orderItem.setPrice(cartItem.getGuitar().getPrice());
+            } else  {
+                orderItem.setPrice(cartItem.getGuitarpart().getPrice());
+            }
+            orderItems.add(orderItem);
+        }
+        order.setItems(orderItems);
+
+        orderRepository.save(order);
 
         // Clear the cart after checkout
         cart.getItems().clear();
         cart.setTotalPrice(0);
         cartRepository.save(cart);
+
+
     }
 
 

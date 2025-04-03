@@ -26,7 +26,7 @@ public class Cart {
     private Customer customer;
 
     @OneToMany(mappedBy = "cart",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @JsonManagedReference("cart-items")
     private List<CartItem> items = new ArrayList<>();
 
     private double totalPrice;
